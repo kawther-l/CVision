@@ -1,0 +1,10 @@
+# Ignore extracted outputs and input resumes data files
+input_resumes/*
+!input_resumes/.gitkeep
+
+extracted_outputs/*
+!extracted_outputs/.gitkeep
+
+# Ignore Python cache files
+__pycache__/
+*.pyc
