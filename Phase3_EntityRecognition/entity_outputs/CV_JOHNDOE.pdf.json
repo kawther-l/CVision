@@ -1,0 +1,29 @@
+{
+  "filename": "CV_JOHNDOE.pdf.json",
+  "name": "John Doe",
+  "locations": [],
+  "education_institutions": [
+    "E Bachelor\u2019S In Computer Science \u2014 University Of California, Los Angeles"
+  ],
+  "degrees": [],
+  "emails": [
+    "johndoe@email.com"
+  ],
+  "phones": [],
+  "skills": [
+    "docker",
+    "python"
+  ],
+  "job_titles": [
+    "Developer",
+    "Project Manager"
+  ],
+  "languages_spoken": [
+    "French",
+    "English"
+  ],
+  "certifications": [],
+  "links": [],
+  "experience_years": null,
+  "summary": null
+}
