@@ -1,0 +1,60 @@
+{
+  "filename": "CV_EXAMPLE.pdf.json",
+  "name": "Kawther Allani",
+  "locations": [
+    "Tunisia"
+  ],
+  "education_institutions": [
+    "Tataouine 2 High School  Tataouine, Tunisia",
+    "Higher Institute Of Technological Studies Of Bizerte  Bizerte, Tunisia"
+  ],
+  "degrees": [
+    "Bachelor Of Network And Security Sep 2020 "
+  ],
+  "emails": [
+    "allanikawther3@gmail.com"
+  ],
+  "phones": [
+    "20 715 116"
+  ],
+  "skills": [
+    "Aws Cloud Foundation",
+    "Azure",
+    "Business Processes",
+    "Linux System Administration",
+    "Clear Communication",
+    "Client Support",
+    "Cross-Functional Technical Processes",
+    "Css",
+    "Css, Javascript, Python",
+    "Erp Systems",
+    "Html",
+    "Hyper-V",
+    "Incident Detection",
+    "Javascript",
+    "Managing Virtualized Environments",
+    "Metasploit",
+    "Mysql",
+    "Network",
+    "Optimization Suggestions",
+    "Oracle",
+    "Php",
+    "Project Coordination",
+  ],
+  "job_titles": [
+    "Data Scientist",
+    "Technical Support"
+  ],
+  "languages_spoken": [
+    "English",
+    "French",
+    "German",
+    "Arabic"
+  ],
+  "certifications": [
+    "Cyberops"
+  ],
+  "links": [],
+  "experience_years": 2,
+  "summary": null
+}
