@@ -1,0 +1,69 @@
+{
+  "filename": "CV BenYahia-Moutia.pdf.json",
+  "relationships": [
+    {
+      "type": "job_in_location",
+      "job_title": "Backend Developer",
+      "location": {
+        "city": "Medenine",
+        "country": "Tunisia"
+      }
+    },
+    {
+      "type": "job_in_location",
+      "job_title": "Backend Developer",
+      "location": {
+        "city": null,
+        "country": "Tunisia"
+      }
+    },
+    {
+      "type": "job_in_location",
+      "job_title": "Developer",
+      "location": {
+        "city": "Medenine",
+        "country": "Tunisia"
+      }
+    },
+    {
+      "type": "job_in_location",
+      "job_title": "Developer",
+      "location": {
+        "city": null,
+        "country": "Tunisia"
+      }
+    },
+    {
+      "type": "job_in_location",
+      "job_title": "Frontend Developer",
+      "location": {
+        "city": "Medenine",
+        "country": "Tunisia"
+      }
+    },
+    {
+      "type": "job_in_location",
+      "job_title": "Frontend Developer",
+      "location": {
+        "city": null,
+        "country": "Tunisia"
+      }
+    },
+    {
+      "type": "job_in_location",
+      "job_title": "Software Engineer",
+      "location": {
+        "city": "Medenine",
+        "country": "Tunisia"
+      }
+    },
+    {
+      "type": "job_in_location",
+      "job_title": "Software Engineer",
+      "location": {
+        "city": null,
+        "country": "Tunisia"
+      }
+    }
+  ]
+}

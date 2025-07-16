@@ -1,0 +1,36 @@
+{
+  "filename": "CV_EXAMPLE.pdf.json",
+  "relationships": [
+    {
+      "type": "job_in_location",
+      "job_title": "Data Scientist",
+      "location": {
+        "city": "Tataouine",
+        "country": "Tunisia"
+      }
+    },
+    {
+      "type": "job_in_location",
+      "job_title": "Technical Support",
+      "location": {
+        "city": "Tataouine",
+        "country": "Tunisia"
+      }
+    },
+    {
+      "type": "degree_from",
+      "degree": "Bachelor Of Network And Security Sep 2020",
+      "institution": "Tataouine 2 High School  Tataouine, Tunisia"
+    },
+    {
+      "type": "degree_from",
+      "degree": "Bachelor Of Network And Security Sep 2020",
+      "institution": "Higher Institute Of Technological Studies Of Bizerte  Bizerte, Tunisia"
+    },
+    {
+      "type": "certification_for_skill",
+      "certification": "Cyberops",
+      "skill": "security"
+    }
+  ]
+}
