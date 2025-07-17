@@ -2,12 +2,12 @@ import os
 import json
 import re
 
-# === Paths ===
+# === Input/Output Directories ===
 input_folder = os.path.join("..", "Phase3_EntityRecognition", "entity_outputs")
 output_folder = "relationship_outputs"
 os.makedirs(output_folder, exist_ok=True)
 
-# === Known Tunisian Cities for City Matching ===
+# === Valid Tunisian Cities for Location Parsing ===
 VALID_CITIES = {
     "tunis", "bizerte", "sousse", "sfax", "gabes", "nabeul", "beja",
     "tataouine", "tozeur", "kairouan", "gafsa", "kasserine", "medenine",
@@ -15,17 +15,14 @@ VALID_CITIES = {
     "ariana", "ben arous", "jendouba"
 }
 
-# === Utility Functions ===
+# === Clean and Parse Utilities ===
 
 def clean_text(text):
-    """Removes unwanted Unicode characters and extra spaces."""
+    """Cleans stray characters from text like « » and whitespace."""
     return re.sub(r"[«»\n\t]+", " ", text).strip()
 
 def parse_location_string(loc_str):
-    """
-    Parses a location string into structured city + country dict.
-    Accepts "Bizerte, Tunisia", "Tunisia", or just "Bizerte".
-    """
+    """Converts strings like 'Sfax, Tunisia' to structured {'city': ..., 'country': ...}."""
     loc_str = loc_str.strip().title()
     parts = [p.strip() for p in loc_str.split(",")]
 
@@ -38,8 +35,12 @@ def parse_location_string(loc_str):
     else:
         return {"city": None, "country": loc_str}
 
+# === Relationship Extraction Logic ===
+
 def infer_relationships(data):
     relationships = []
+
+    # Extract data
     job_titles = data.get("job_titles", [])
     locations = data.get("locations", [])
     degrees = data.get("degrees", [])
@@ -47,7 +48,7 @@ def infer_relationships(data):
     certs = [clean_text(c.lower()) for c in data.get("certifications", [])]
     skills = [clean_text(s.lower()) for s in data.get("skills", [])]
 
-    # === Job ↔ Location relationships ===
+    # — Job ↔ Location
     for title in job_titles:
         if locations:
             for loc in locations:
@@ -57,8 +58,7 @@ def infer_relationships(data):
                     "job_title": title,
                     "location": parsed
                 })
-        elif institutions:
-            # Trying to extract city from institution if no locations exist
+        else:
             for inst in institutions:
                 for city in VALID_CITIES:
                     if city in inst.lower():
@@ -71,21 +71,20 @@ def infer_relationships(data):
                             }
                         })
 
-    # === Degree ↔ Institution relationships ===
+    # — Degree ↔ Institution
     matched_pairs = set()
     for degree in degrees:
-        clean_degree = clean_text(degree)
         for inst in institutions:
-            clean_inst = clean_text(inst)
-            if (clean_degree, clean_inst) not in matched_pairs:
+            pair = (degree, inst)
+            if pair not in matched_pairs:
                 relationships.append({
                     "type": "degree_from",
-                    "degree": clean_degree,
-                    "institution": clean_inst
+                    "degree": clean_text(degree),
+                    "institution": clean_text(inst)
                 })
-                matched_pairs.add((clean_degree, clean_inst))
+                matched_pairs.add(pair)
 
-    # === Certification ↔ Skill relationships ===
+    # — Certification ↔ Skill
     for cert in certs:
         for skill in skills:
             if cert in skill or skill in cert:
