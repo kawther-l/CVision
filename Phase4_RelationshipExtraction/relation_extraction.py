@@ -58,7 +58,7 @@ def infer_relationships(data):
                     "location": parsed
                 })
         elif institutions:
-            # Try to extract city from institution if no locations exist
+            # Trying to extract city from institution if no locations exist
             for inst in institutions:
                 for city in VALID_CITIES:
                     if city in inst.lower():
