@@ -1,120 +1,67 @@
-import os
 import json
+import os
 import re
+from collections import defaultdict
+from difflib import SequenceMatcher
 
-# === Input/Output Directories ===
-input_folder = os.path.join("..", "Phase3_EntityRecognition", "entity_outputs")
-output_folder = "relationship_outputs"
-os.makedirs(output_folder, exist_ok=True)
+# I used this function to measure how similar two strings are.
+# It helps detect soft matches between job titles, skills, and degrees.
+def similar(a, b):
+    return SequenceMatcher(None, a.lower(), b.lower()).ratio()
 
-# === Valid Tunisian Cities for Location Parsing ===
-VALID_CITIES = {
-    "tunis", "bizerte", "sousse", "sfax", "gabes", "nabeul", "beja",
-    "tataouine", "tozeur", "kairouan", "gafsa", "kasserine", "medenine",
-    "monastir", "kebili", "mahdia", "manouba", "siliana", "zaghouan",
-    "ariana", "ben arous", "jendouba"
-}
+# This is the main function that processes all resume JSON files to extract relationships.
+def rel_all(input_folder: str, output_folder: str) -> None:
+    """
+    For each enhanced JSON resume file, this function extracts potential relationships
+    between degrees, skills, and job titles, such as skill-to-job and degree-to-job mappings.
 
-# === Clean and Parse Utilities ===
+    Args:
+        input_folder (str): Path to the folder containing enhanced JSON resume files.
+        output_folder (str): Path to the folder where relationship-enhanced JSON files will be saved.
+    """
+    # I make sure the output directory exists before saving any files
+    os.makedirs(output_folder, exist_ok=True)
 
-def clean_text(text):
-    """Cleans stray characters from text like « » and whitespace."""
-    return re.sub(r"[«»\n\t]+", " ", text).strip()
+    # Loop through each JSON resume file in the input directory
+    for filename in os.listdir(input_folder):
+        if not filename.endswith('.json'):
+            continue
 
-def parse_location_string(loc_str):
-    """Converts strings like 'Sfax, Tunisia' to structured {'city': ..., 'country': ...}."""
-    loc_str = loc_str.strip().title()
-    parts = [p.strip() for p in loc_str.split(",")]
+        input_path = os.path.join(input_folder, filename)
+        with open(input_path, "r", encoding="utf-8") as file:
+            data = json.load(file)
 
-    if len(parts) == 2:
-        return {"city": parts[0], "country": parts[1]}
-    elif loc_str.lower() in VALID_CITIES:
-        return {"city": loc_str, "country": "Tunisia"}
-    elif loc_str == "Tunisia":
-        return {"city": None, "country": "Tunisia"}
-    else:
-        return {"city": None, "country": loc_str}
+        # I extract relevant fields that can have logical relationships
+        skills = data.get("skills", [])
+        job_titles = data.get("job_titles", [])
+        degree_titles = data.get("degree_titles", [])
+        degree_types = data.get("degree_types", [])
 
-# === Relationship Extraction Logic ===
+        # I will store the relationships here
+        relationships = {
+            "skill_to_job": [],
+            "degree_to_job": []
+        }
 
-def infer_relationships(data):
-    relationships = []
-
-    # Extract data
-    job_titles = data.get("job_titles", [])
-    locations = data.get("locations", [])
-    degrees = data.get("degrees", [])
-    institutions = data.get("education_institutions", [])
-    certs = [clean_text(c.lower()) for c in data.get("certifications", [])]
-    skills = [clean_text(s.lower()) for s in data.get("skills", [])]
-
-    # — Job ↔ Location
-    for title in job_titles:
-        if locations:
-            for loc in locations:
-                parsed = parse_location_string(loc)
-                relationships.append({
-                    "type": "job_in_location",
-                    "job_title": title,
-                    "location": parsed
-                })
-        else:
-            for inst in institutions:
-                for city in VALID_CITIES:
-                    if city in inst.lower():
-                        relationships.append({
-                            "type": "job_in_location",
-                            "job_title": title,
-                            "location": {
-                                "city": city.title(),
-                                "country": "Tunisia"
-                            }
-                        })
-
-    # — Degree ↔ Institution
-    matched_pairs = set()
-    for degree in degrees:
-        for inst in institutions:
-            pair = (degree, inst)
-            if pair not in matched_pairs:
-                relationships.append({
-                    "type": "degree_from",
-                    "degree": clean_text(degree),
-                    "institution": clean_text(inst)
-                })
-                matched_pairs.add(pair)
-
-    # — Certification ↔ Skill
-    for cert in certs:
+        # I match each skill with job titles to see which skills relate to which roles
         for skill in skills:
-            if cert in skill or skill in cert:
-                relationships.append({
-                    "type": "certification_for_skill",
-                    "certification": cert.title(),
-                    "skill": skill.title()
-                })
+            for job in job_titles:
+                if similar(skill, job) > 0.4 or skill.lower() in job.lower() or job.lower() in skill.lower():
+                    relationships["skill_to_job"].append({"skill": skill, "job_title": job})
 
-    return relationships
+        # I match degrees (titles and types) to job titles similarly
+        for degree in degree_titles + degree_types:
+            for job in job_titles:
+                if similar(degree, job) > 0.4 or degree.lower() in job.lower() or job.lower() in degree.lower():
+                    relationships["degree_to_job"].append({"degree": degree, "job_title": job})
 
-# === Main Loop ===
+        # I embed the extracted relationships back into the resume JSON
+        data["relationships"] = relationships
+        data["relationships_count"] = len(relationships["skill_to_job"]) + len(relationships["degree_to_job"])
 
-for filename in os.listdir(input_folder):
-    if not filename.endswith(".json"):
-        continue
+        # I save the enhanced JSON with relationships added
+        output_path = os.path.join(output_folder, filename)
+        with open(output_path, "w", encoding="utf-8") as out_file:
+            json.dump(data, out_file, indent=4, ensure_ascii=False)
 
-    with open(os.path.join(input_folder, filename), "r", encoding="utf-8") as f:
-        data = json.load(f)
-
-    rels = infer_relationships(data)
-
-    output = {
-        "filename": filename,
-        "relationships": rels
-    }
-
-    with open(os.path.join(output_folder, filename), "w", encoding="utf-8") as out_f:
-        json.dump(output, out_f, indent=2)
-
-    print(f"✅ Relationships extracted: {filename}")
-
-print("\n🔗 Phase 4 complete — Smart relationships saved to 'relationship_outputs'")
+        print(f"[✔] Relationships extracted for {filename}")
